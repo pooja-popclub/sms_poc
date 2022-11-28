@@ -54,6 +54,16 @@ public class ApiResponse1 {
       String pharma;
       @SerializedName("coins")
       String coins;
+      @SerializedName("message")
+      String message;
+
+      public String getMessage() {
+         return message;
+      }
+
+      public void setMessage(String message) {
+         this.message = message;
+      }
 
       public String getFoodOrdering() {
          return foodOrdering;

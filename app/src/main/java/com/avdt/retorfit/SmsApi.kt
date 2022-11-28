@@ -15,6 +15,10 @@ interface SmsApi {
     fun loginApi(@Body map: HashMap<String, Any>): Call<ApiResponse>
 
     @Headers("os_type: android")
-    @GET(" /api/v1/category-transaction/coins")
+    @GET("/api/v1/category-transaction/coins")
     fun getDataFromTheServer(): Call<ApiResponse1>
+
+    @Headers("os_type: android")
+    @POST("/api/v1/category-transaction/calculate/coins")
+    fun calculateCoins(@Body map: HashMap<String, Any>): Call<ApiResponse1>
 }

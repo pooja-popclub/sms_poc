@@ -44,6 +44,7 @@ var tvInformation: TextView? = null
     var loginDetails: TextView? = null
     var btnLogin: Button? = null
     var btnLogout: Button? = null
+    var btnCalCoins: Button? = null
 
     var creditSmsList: ArrayList<UserDetailsDto> = ArrayList()
 
@@ -70,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         loginDetails = findViewById(R.id.loginDetails)
         btnLogin = findViewById(R.id.btnLogin)
         btnLogout = findViewById(R.id.btnLogout)
+        btnCalCoins = findViewById(R.id.btnCalCoins)
 
         btnFoodOrderList?.setOnClickListener {
             if (checkAndRequestPermissions()) {
@@ -151,9 +153,14 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please enter 10 digit mobile number", Toast.LENGTH_SHORT).show()
 
             }
-          //  progressBar?.visibility=View.VISIBLE
-           // GlobalFunctions.getDataFromTheServer(this)
         }
+
+        btnCalCoins?.setOnClickListener {
+            val map = HashMap<String, Any>()
+            map["os_type"] = "android"
+            GlobalFunctions.calculateCoins(this,map)
+          }
+
         btnLogout?.setOnClickListener {
            GlobalFunctions.clearSharedPrefs(this)
             etMobileNumber?.setText("")
@@ -225,7 +232,7 @@ class MainActivity : AppCompatActivity() {
                     val message = UserDetailsDto()
                     val bankList = arrayOf("HDFC","ICICI","AXIS","SBI","CITI","Kotak","IDFC","Axis","IndusInd","Yes Bank","PNB","BOB","BOI")
                     val utilityList = arrayOf("Paytm","PhonePe","Google Pay","OlaMoney","Simpl","Amazon Pay","FreeCharge","JioMoney","BHIM","Mobikwik","Airtel Money")
-                    val matchesCreditDebit = arrayOf("Debit","debit","Paying","paying","Spent","spent","Paid","paid","Payment","payment")
+                    val matchesDebitType = arrayOf("Debit","debit","Paying","paying","Spent","spent","Paid","paid","Payment","payment")
 
                     val regEx: Pattern =
                         Pattern.compile("(?i)(?:(?:RS|INR|MRP)\\.?\\s?)(\\d+(:?\\,\\d+)?(\\,\\d+)?(\\.\\d{1,2})?)")
@@ -234,7 +241,7 @@ class MainActivity : AppCompatActivity() {
 
                     val groceryPartnerList = arrayOf("Big Basket","Zepto","zepto","Grofers","Blinkit")
                     val entertainmentPartnerList = arrayOf("bookmyshow","Bookmyshow")
-                    val foodPartnerList = arrayOf("Zomato","ZOMATO","zomato","Swiggy","SWIGGY","MCDONALDS"," BARBEQUE-NATION","KFC")
+                    val foodPartnerList = arrayOf("Zomato","ZOMATO","zomato","Swiggy","SWIGGY","MCDONALDS"," BARBEQUE-NATION","KFC","Domino's")
                     val travelPartnerList = arrayOf("Yatra","YATRA","IBIBO","UBER","Cleartrip","Ola","ola","Rapido","rapido","redbus","MakeMyTrip","EasyMyTrip","IndiGo")
                     val eComPartnerList = arrayOf("Flipkart","flipkart","Amazon","amazon","Myntra","myntra","Nykaa","nykaa","Ajio","ajio")
 
@@ -242,7 +249,7 @@ class MainActivity : AppCompatActivity() {
 
                     for (bl in bankList) {
                         if (cursor.getString(3).contains(bl)) {
-                            for (cd in matchesCreditDebit) {
+                            for (cd in matchesDebitType) {
                                 if (cursor.getString(3).contains(cd)) {
                                     val amt: Matcher = regEx.matcher(cursor.getString(3))
                                     if (amt.find()) {
@@ -259,7 +266,7 @@ class MainActivity : AppCompatActivity() {
 
                     for (ul in utilityList) {
                         if (cursor.getString(3).contains(ul)) {
-                            for (cd in matchesCreditDebit) {
+                            for (cd in matchesDebitType) {
                                 if (cursor.getString(3).contains(cd)) {
                                     val amt: Matcher = regEx.matcher(cursor.getString(3))
                                     if (amt.find()) {
@@ -354,7 +361,11 @@ class MainActivity : AppCompatActivity() {
         progressBar?.visibility=View.GONE
         recyclerView?.visibility=View.GONE
         tvInformation?.visibility=View.VISIBLE
-        tvInformation?.setText("My Coin's: "+info.data.coins)
+        if (!TextUtils.isEmpty(info.data.message)){
+            tvInformation?.setText("Coin's Calculation Status: " + info.data.message)
+        }else {
+            tvInformation?.setText("My Coin's: " + info.data.coins)
+        }
     }
 
     private fun checkAndRequestPermissions(): Boolean {

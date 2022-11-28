@@ -168,6 +168,28 @@ public class GlobalFunctions {
         });
     }
 
+    public static void calculateCoins(@NotNull MainActivity mainActivity, HashMap<String, Object> map) {
+        final Call<ApiResponse1> call = initRetrofit(mainActivity)
+                .create(SmsApi.class)
+                .calculateCoins(map);
+        call.enqueue(new CancelableCallback<ApiResponse1>("TAG") {
+            @Override
+            public void onResponse(Call<ApiResponse1> call, Response<ApiResponse1> response) {
+                if (response.code() == 200 && response.body() != null) {
+                    mainActivity.showResponseOfGet(response.body());
+                    Log.d("Error",""+response.body());
+                } else {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse1> call, Throwable t) {
+                //Log.d("Failure",""+map);
+            }
+        });
+    }
+
     public static String getSharedPrefs(Context c, String key,
                                         String default_value) {
         if (c == null) {

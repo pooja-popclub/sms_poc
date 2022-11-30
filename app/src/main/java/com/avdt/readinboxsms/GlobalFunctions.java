@@ -190,6 +190,28 @@ public class GlobalFunctions {
         });
     }
 
+    public static void getCateInformation(@NotNull MainActivity mainActivity) {
+        final Call<ApiResponse> call = initRetrofit(mainActivity)
+                .create(SmsApi.class)
+                .getCateInformation();
+        call.enqueue(new CancelableCallback<ApiResponse>("TAG") {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                if (response.code() == 200 && response.body() != null) {
+                    mainActivity.showSettingDetails(response.body());
+                    Log.d("Error",""+response.body());
+                } else {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                //Log.d("Failure",""+map);
+            }
+        });
+    }
+
     public static String getSharedPrefs(Context c, String key,
                                         String default_value) {
         if (c == null) {

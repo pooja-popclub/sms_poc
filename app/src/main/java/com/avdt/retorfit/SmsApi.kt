@@ -21,4 +21,7 @@ interface SmsApi {
     @Headers("os_type: android")
     @POST("/api/v1/category-transaction/calculate/coins")
     fun calculateCoins(@Body map: HashMap<String, Any>): Call<ApiResponse1>
+
+    @GET("/sms/search/settings")
+    fun getCateInformation(): Call<ApiResponse>
 }

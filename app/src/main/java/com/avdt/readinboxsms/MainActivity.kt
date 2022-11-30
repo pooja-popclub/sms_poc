@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlin.collections.ArrayList
 
 
 var tvInformation: TextView? = null
@@ -47,6 +48,15 @@ var tvInformation: TextView? = null
     var btnCalCoins: Button? = null
 
     var creditSmsList: ArrayList<UserDetailsDto> = ArrayList()
+    var bankList: ArrayList<String?> = ArrayList()
+    var categoriesList: ArrayList<String?> = ArrayList()
+    var utilityList: ArrayList<String?> = ArrayList()
+    var searchKeywordsList: ArrayList<String?> = ArrayList()
+    var groceryPartnerList: ArrayList<String?> = ArrayList()
+    var entertainmentPartnerList: ArrayList<String?> = ArrayList()
+    var foodPartnerList: ArrayList<String?> = ArrayList()
+    var travelPartnerList: ArrayList<String?> = ArrayList()
+    var eComPartnerList: ArrayList<String?> = ArrayList()
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +82,8 @@ class MainActivity : AppCompatActivity() {
         btnLogin = findViewById(R.id.btnLogin)
         btnLogout = findViewById(R.id.btnLogout)
         btnCalCoins = findViewById(R.id.btnCalCoins)
+
+        GlobalFunctions.getCateInformation(this)
 
         btnFoodOrderList?.setOnClickListener {
             if (checkAndRequestPermissions()) {
@@ -226,56 +238,147 @@ class MainActivity : AppCompatActivity() {
             cursor.moveToLast()
             if (cursor.count > 0) {
                 do {
-
                     //top `10 bank
                     //last sms like 1 month
                     val message = UserDetailsDto()
-                    val bankList = arrayOf("HDFC","ICICI","AXIS","SBI","CITI","Kotak","IDFC","Axis","IndusInd","Yes Bank","PNB","BOB","BOI")
-                    val utilityList = arrayOf("Paytm","PhonePe","Google Pay","OlaMoney","Simpl","Amazon Pay","FreeCharge","JioMoney","BHIM","Mobikwik","Airtel Money")
-                    val matchesDebitType = arrayOf("Debit","debit","Paying","paying","Spent","spent","Paid","paid","Payment","payment")
+                    val bankList = bankList
+                    val utilityList = utilityList
+                    val matchesDebitType = searchKeywordsList
 
                     val regEx: Pattern =
                         Pattern.compile("(?i)(?:(?:RS|INR|MRP)\\.?\\s?)(\\d+(:?\\,\\d+)?(\\,\\d+)?(\\.\\d{1,2})?)")
 
                     val paymentMode = arrayOf("UPI","Net Banking","NetBanking","CREDIT Card","Credit Card","Paytm","PhonePe","Google Pay","OlaMoney","Simpl","Amazon Pay","FreeCharge","JioMoney","BHIM","Mobikwik","Airtel Money")
 
-                    val groceryPartnerList = arrayOf("Big Basket","Zepto","zepto","Grofers","Blinkit")
-                    val entertainmentPartnerList = arrayOf("bookmyshow","Bookmyshow")
-                    val foodPartnerList = arrayOf("Zomato","ZOMATO","zomato","Swiggy","SWIGGY","MCDONALDS"," BARBEQUE-NATION","KFC","Domino's")
-                    val travelPartnerList = arrayOf("Yatra","YATRA","IBIBO","UBER","Cleartrip","Ola","ola","Rapido","rapido","redbus","MakeMyTrip","EasyMyTrip","IndiGo")
-                    val eComPartnerList = arrayOf("Flipkart","flipkart","Amazon","amazon","Myntra","myntra","Nykaa","nykaa","Ajio","ajio")
-
-
-
                     for (bl in bankList) {
-                        if (cursor.getString(3).contains(bl)) {
+                        bl?.let {
+                        if (cursor.getString(1).contains(it,ignoreCase = true) || cursor.getString(3).contains(it,ignoreCase = true)) {
                             for (cd in matchesDebitType) {
-                                if (cursor.getString(3).contains(cd)) {
-                                    val amt: Matcher = regEx.matcher(cursor.getString(3))
-                                    if (amt.find()) {
-                                        creditSmsList = getListOfSMS(bl,cd,paymentMode,amt,cursor,message, "Grocery",groceryPartnerList)
-                                        creditSmsList = getListOfSMS(bl,cd,paymentMode,amt,cursor,message, "Entertainment",entertainmentPartnerList)
-                                        creditSmsList = getListOfSMS(bl,cd,paymentMode,amt,cursor,message,"Food ordering",foodPartnerList)
-                                        creditSmsList = getListOfSMS(bl,cd,paymentMode,amt,cursor,message, "Travel",travelPartnerList)
-                                        creditSmsList = getListOfSMS(bl,cd,paymentMode,amt,cursor,message, "Ecom",eComPartnerList)
+                                cd?.let {
+                                    if (cursor.getString(3).contains(cd,ignoreCase = true)) {
+
+                                        val amt: Matcher = regEx.matcher(cursor.getString(3))
+                                        if (amt.find()) {
+                                            Log.d("MANISH_JAIN",""+cursor.getString(1))
+                                            creditSmsList = getListOfSMS(
+                                                bl,
+                                                cd,
+                                                paymentMode,
+                                                amt,
+                                                cursor,
+                                                message,
+                                                "Grocery",
+                                                groceryPartnerList
+                                            )
+                                            creditSmsList = getListOfSMS(
+                                                bl,
+                                                cd,
+                                                paymentMode,
+                                                amt,
+                                                cursor,
+                                                message,
+                                                "Entertainment",
+                                                entertainmentPartnerList
+                                            )
+                                            creditSmsList = getListOfSMS(
+                                                bl,
+                                                cd,
+                                                paymentMode,
+                                                amt,
+                                                cursor,
+                                                message,
+                                                "Food ordering",
+                                                foodPartnerList
+                                            )
+                                            creditSmsList = getListOfSMS(
+                                                bl,
+                                                cd,
+                                                paymentMode,
+                                                amt,
+                                                cursor,
+                                                message,
+                                                "Travel",
+                                                travelPartnerList
+                                            )
+                                            creditSmsList = getListOfSMS(
+                                                bl,
+                                                cd,
+                                                paymentMode,
+                                                amt,
+                                                cursor,
+                                                message,
+                                                "Ecom",
+                                                eComPartnerList
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                 }
 
                     for (ul in utilityList) {
-                        if (cursor.getString(3).contains(ul)) {
-                            for (cd in matchesDebitType) {
-                                if (cursor.getString(3).contains(cd)) {
-                                    val amt: Matcher = regEx.matcher(cursor.getString(3))
-                                    if (amt.find()) {
-                                        creditSmsList = getListOfSMS(ul,cd,paymentMode,amt,cursor,message, "Grocery",groceryPartnerList)
-                                        creditSmsList = getListOfSMS(ul,cd,paymentMode,amt,cursor,message, "Entertainment",entertainmentPartnerList)
-                                        creditSmsList = getListOfSMS(ul,cd,paymentMode,amt,cursor,message,"Food ordering",foodPartnerList)
-                                        creditSmsList = getListOfSMS(ul,cd,paymentMode,amt,cursor,message, "Travel",travelPartnerList)
-                                        creditSmsList = getListOfSMS(ul,cd,paymentMode,amt,cursor,message, "Ecom",eComPartnerList)
+                        ul?.let {
+                            if (cursor.getString(1).contains(it,ignoreCase = true) ||cursor.getString(3).contains(ul,ignoreCase = true)) {
+                                for (cd in matchesDebitType) {
+                                    cd?.let {
+                                        if (cursor.getString(3).contains(cd,ignoreCase = true)) {
+                                            val amt: Matcher = regEx.matcher(cursor.getString(3))
+                                            if (amt.find()) {
+                                                creditSmsList = getListOfSMS(
+                                                    ul,
+                                                    cd,
+                                                    paymentMode,
+                                                    amt,
+                                                    cursor,
+                                                    message,
+                                                    "Grocery",
+                                                    groceryPartnerList
+                                                )
+                                                creditSmsList = getListOfSMS(
+                                                    ul,
+                                                    cd,
+                                                    paymentMode,
+                                                    amt,
+                                                    cursor,
+                                                    message,
+                                                    "Entertainment",
+                                                    entertainmentPartnerList
+                                                )
+                                                creditSmsList = getListOfSMS(
+                                                    ul,
+                                                    cd,
+                                                    paymentMode,
+                                                    amt,
+                                                    cursor,
+                                                    message,
+                                                    "Food ordering",
+                                                    foodPartnerList
+                                                )
+                                                creditSmsList = getListOfSMS(
+                                                    ul,
+                                                    cd,
+                                                    paymentMode,
+                                                    amt,
+                                                    cursor,
+                                                    message,
+                                                    "Travel",
+                                                    travelPartnerList
+                                                )
+                                                creditSmsList = getListOfSMS(
+                                                    ul,
+                                                    cd,
+                                                    paymentMode,
+                                                    amt,
+                                                    cursor,
+                                                    message,
+                                                    "Ecom",
+                                                    eComPartnerList
+                                                )
 
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -291,27 +394,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getListOfSMS(bankName: String, creditDebitType: String, paymentMode: Array<String>, amountType: Matcher, cursor: Cursor,
-                             message: UserDetailsDto, categoryType: String, partnerList: Array<String>): ArrayList<UserDetailsDto> {
+    private fun getListOfSMS(
+        bankName: String, creditDebitType: String, paymentMode: Array<String>, amountType: Matcher, cursor: Cursor,
+        message: UserDetailsDto, categoryType: String, partnerList: ArrayList<String?>): ArrayList<UserDetailsDto> {
         for (fl in partnerList) {
-            if (cursor.getString(3).contains(fl)) {
-                for (pm in paymentMode) {
-                    if (cursor.getString(3).contains(pm)) {
-                        message.msg_payment_mode = pm
+            fl?.let {
+                if (cursor.getString(3).contains(fl,ignoreCase = true)) {
+                    for (pm in paymentMode) {
+                        if (cursor.getString(3).contains(pm,ignoreCase = true)) {
+                            message.msg_payment_mode = pm
+                        }
                     }
+                    var amount: String =
+                        amountType.group(0).replace("inr", "")
+                    amount = getTheAmount(amount)
+                    message.msg_amount = amount.toDouble()
+                    message.msg_number = (cursor.getString(1))
+                    message.msg_date = (cursor.getString(2))
+                    message.msg_body = (cursor.getString(3))
+                    message.platform = fl
+                    message.msg_type = creditDebitType
+                    message.msg_bank = bankName
+                    message.category = categoryType
+                    creditSmsList.add(message)
                 }
-                var amount: String =
-                    amountType.group(0).replace("inr", "")
-                amount = getTheAmount(amount)
-                message.msg_amount = amount.toDouble()
-                message.msg_number = (cursor.getString(1))
-                message.msg_date = (cursor.getString(2))
-                message.msg_body = (cursor.getString(3))
-                message.platform = fl
-                message.msg_type = creditDebitType
-                message.msg_bank = bankName
-                message.category = categoryType
-                creditSmsList.add(message)
             }
         }
         return creditSmsList
@@ -365,6 +471,45 @@ class MainActivity : AppCompatActivity() {
             tvInformation?.setText("Coin's Calculation Status: " + info.data.message)
         }else {
             tvInformation?.setText("My Coin's: " + info.data.coins)
+        }
+    }
+
+    fun showSettingDetails(info: ApiResponse){
+        progressBar?.visibility=View.GONE
+        recyclerView?.visibility=View.GONE
+        tvInformation?.visibility=View.VISIBLE
+        //list of banks
+        bankList.clear()
+        categoriesList.clear()
+        utilityList.clear()
+        searchKeywordsList.clear()
+        groceryPartnerList.clear()
+        entertainmentPartnerList.clear()
+        foodPartnerList.clear()
+        travelPartnerList.clear()
+        eComPartnerList.clear()
+        if (info.data != null) {
+            info.data.banks_sms_headers.HDFC?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.ICICI?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.AXIS?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.SBI?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.CITI?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.KOTAK?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.IDFC?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.INDUSIND?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.YESBANK?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.PNB?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.BOB?.let { bankList.addAll(it) }
+            info.data.banks_sms_headers.BOI?.let { bankList.addAll(it) }
+
+            info.data.categories?.let { categoriesList.addAll(it) }
+            info.data.utility_names?.let { utilityList.addAll(it) }
+            info.data.search_keywords?.let { searchKeywordsList.addAll(it) }
+            info.data.platforms.grocery?.let { groceryPartnerList.addAll(it) }
+            info.data.platforms.entertainment?.let { entertainmentPartnerList.addAll(it) }
+            info.data.platforms.foodOrdering?.let { foodPartnerList.addAll(it) }
+            info.data.platforms.travel?.let { travelPartnerList.addAll(it) }
+            info.data.platforms.ecom?.let { eComPartnerList.addAll(it) }
         }
     }
 
